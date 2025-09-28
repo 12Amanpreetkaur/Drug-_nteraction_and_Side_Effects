@@ -1,0 +1,20 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python compiled files
+__pycache__/
+*.pyc
+
+# Database files that should not be committed
+# This prevents your working database from being pushed.
+# The server should run seed_db.py or migrate a fresh DB.
+drugs.db
+
+# Configuration or sensitive files
+*.env
+*.pem
+*.key
+.DS_Store # Mac operating system files
+Thumbs.db # Windows operating system files

@@ -1,0 +1,52 @@
+drug_a,drug_b,severity,description
+Aspirin,Warfarin,high,Increased risk of bleeding
+Aspirin,Ibuprofen,moderate,May increase risk of gastrointestinal bleeding
+Aspirin,Metformin,low,No major interaction, but monitor for stomach upset
+Ibuprofen,Lisinopril,moderate,May reduce effectiveness of blood pressure medication
+Ibuprofen,Warfarin,high,Increased risk of bleeding
+Ibuprofen,Metformin,low,No major interaction, monitor blood sugar
+Metformin,Contrast Dye,high,Can cause lactic acidosis when combined with contrast imaging
+Metformin,Insulin,moderate,May increase risk of hypoglycemia
+Simvastatin,Amiodarone,high,Increased risk of muscle damage
+Simvastatin,Clarithromycin,high,Increased risk of rhabdomyolysis
+Atorvastatin,Clarithromycin,high,Increased risk of rhabdomyolysis
+Omeprazole,Clopidogrel,moderate,May reduce effectiveness of Clopidogrel
+Levothyroxine,Calcium Carbonate,moderate,Calcium can interfere with absorption of thyroid medication
+Levothyroxine,Iron Supplements,moderate,Iron may reduce absorption of thyroid hormone
+Furosemide,Lisinopril,moderate,May increase risk of low blood pressure or kidney issues
+Furosemide,Digoxin,high,May increase risk of digoxin toxicity
+Lisinopril,Potassium Supplements,high,May cause dangerously high potassium levels
+Lisinopril,NSAIDs,moderate,May reduce blood pressure lowering effects and affect kidneys
+Warfarin,Amiodarone,high,Increased risk of bleeding, monitor INR closely
+Warfarin,Clopidogrel,high,Increased risk of bleeding
+Clopidogrel,Omeprazole,moderate,May reduce effectiveness of Clopidogrel
+Insulin,Metformin,moderate,May increase risk of hypoglycemia
+Insulin,Glibenclamide,high,High risk of hypoglycemia
+Paracetamol,Warfarin,moderate,Prolonged use may increase bleeding risk
+Paracetamol,Alcohol,high,Increased risk of liver toxicity
+Alprazolam,Fluoxetine,moderate,May increase sedation and respiratory depression
+Alprazolam,Alcohol,high,Severe sedation and respiratory depression risk
+Amoxicillin,Warfarin,moderate,May increase bleeding risk
+Amoxicillin,Oral Contraceptives,low,May reduce effectiveness of contraceptives
+Citalopram,Tramadol,high,Risk of serotonin syndrome
+Citalopram,Alcohol,moderate,May increase sedation
+Fluoxetine,Warfarin,high,Increased risk of bleeding
+Fluoxetine,Tramadol,high,Risk of serotonin syndrome
+Atorvastatin,Amiodarone,high,Increased risk of muscle damage
+Metoprolol,Clonidine,moderate,Additive blood pressure lowering effects
+Metoprolol,Verapamil,high,May cause bradycardia or heart block
+Amlodipine,Simvastatin,moderate,May increase risk of muscle damage
+Amlodipine,Grapefruit Juice,moderate,May increase drug levels of Amlodipine
+Cefalexin,Warfarin,moderate,May increase bleeding risk
+Hydrochlorothiazide,Lisinopril,moderate,May increase risk of low blood pressure
+Hydrochlorothiazide,Digoxin,high,May increase risk of digoxin toxicity
+Prednisone,NSAIDs,high,Increased risk of gastrointestinal bleeding
+Prednisone,Warfarin,moderate,May affect anticoagulation
+Levothyroxine,Omeprazole,moderate,May reduce absorption of thyroid hormone
+Omeprazole,Clarithromycin,low,Generally safe, monitor for stomach upset
+Ranitidine,Warfarin,low,Minor interactions possible, monitor INR
+Ranitidine,Ketoconazole,moderate,May reduce absorption of ketoconazole
+Metformin,Glibenclamide,high,Risk of hypoglycemia
+Simvastatin,Warfarin,moderate,Monitor for muscle toxicity
+Paracetamol,Ibuprofen,low,Generally safe combination
+Ibuprofen,Aspirin,moderate,May increase risk of GI bleeding

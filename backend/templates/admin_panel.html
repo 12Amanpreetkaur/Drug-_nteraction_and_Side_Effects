@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container" style="padding-top:50px;">
+    <h2>Admin Dashboard</h2>
+    <a href="/admin/logout" class="btn btn-danger mb-3">Logout</a>
+    <h4>Upload Interaction CSV</h4>
+    <form id="uploadForm">
+        <input type="file" id="csvFile" class="form-control mb-2">
+        <button class="btn btn-success">Upload</button>
+    </form>
+    <h4 class="mt-4">Current Interactions</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr><th>Drug A</th><th>Drug B</th><th>Severity</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+            {% for i in interactions %}
+            <tr>
+                <td>{{i.drug_a}}</td>
+                <td>{{i.drug_b}}</td>
+                <td>{{i.severity}}</td>
+                <td>{{i.note}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.getElementById('uploadForm').onsubmit = async function(e){
+    e.preventDefault();
+    let file = document.getElementById('csvFile').files[0];
+    if(!file){alert('Select a CSV'); return;}
+    let formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/import_csv',{method:'POST', body: formData});
+    const data = await res.json();
+    alert('Imported '+data.imported+' interactions.');
+    location.reload();
+}
+</script>
+</body>
+</html>

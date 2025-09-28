@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Interaction & Side Effects Checker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gradient: linear-gradient(135deg, #4a6fa5 0%, #6b8cbc 100%);
+        }
+        
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+        
+        .header-container {
+            background: var(--gradient);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .drug-tag {
+            display: inline-flex;
+            align-items: center;
+            background-color: #e9f2ff;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 5px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .badge-high {
+            background-color: var(--danger);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .badge-moderate {
+            background-color: var(--warning);
+            color: black;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .badge-low {
+            background-color: var(--success);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .interaction-card {
+            border-left: 4px solid;
+            margin-bottom: 15px;
+        }
+        
+        .interaction-high {
+            border-left-color: var(--danger);
+        }
+        
+        .interaction-moderate {
+            border-left-color: var(--warning);
+        }
+        
+        .interaction-low {
+            border-left-color: var(--success);
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .search-input {
+            padding-left: 40px;
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            height: 50px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            height: 50px;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            height: 50px;
+        }
+        
+        .severity-section {
+            margin-bottom: 30px;
+        }
+        
+        .severity-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .severity-icon {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .no-interactions {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .drug-count {
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+        
+        .clear-all {
+            cursor: pointer;
+            color: var(--danger);
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        /* Improved Autocomplete Styling */
+        .ui-autocomplete {
+            background-color: white;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .ui-menu-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: pointer;
+        }
+        
+        .ui-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .ui-state-focus {
+            background-color: #e9f2ff;
+            color: #333;
+            border: none;
+            border-radius: 0;
+            margin: 0;
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 12px 25px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            background-color: white;
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            background-color: white;
+            border-radius: 0 15px 15px 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .drug-info-card {
+            border-left: 4px solid var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .drug-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        /* Side Effects Styling */
+        .side-effect-item {
+            padding: 10px 15px;
+            border-left: 4px solid;
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .side-effect-common {
+            border-left-color: #ffc107;
+            background-color: #fffbf0;
+        }
+        
+        .side-effect-serious {
+            border-left-color: #dc3545;
+            background-color: #fdf2f2;
+        }
+        
+        .side-effect-rare {
+            border-left-color: #17a2b8;
+            background-color: #f0f9ff;
+        }
+        
+        .side-effect-frequency {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .chatbot-button {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .chatbot-window {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chatbot-header {
+            background: var(--gradient);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: #e9f2ff;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background-color: #f0f0f0;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chatbot-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .chatbot-input input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 10px 15px;
+            outline: none;
+        }
+        
+        .chatbot-input button {
+            background: var(--primary);
+            border: none;
+            color: white;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .suggestion {
+            background: #f0f4f8;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .suggestion:hover {
+            background: #e0e7f1;
+        }
+        
+        /* Side Effects Comparison */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 20px 15px;
+            }
+            
+            .search-input, .btn-primary, .btn-success {
+                height: 45px;
+                margin-bottom: 10px;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .chatbot-window {
+                width: 300px;
+                height: 400px;
+            }
+            
+            .comparison-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-container text-center">
+            <h1><i class="fas fa-pills me-2"></i>Drug Interaction & Side Effects Checker</h1>
+            <p class="mb-0">Check for potential interactions and side effects of medications</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="interaction-tab" data-bs-toggle="tab" data-bs-target="#interaction" type="button" role="tab" aria-controls="interaction" aria-selected="true">
+                            <i class="fas fa-exchange-alt me-2"></i>Check Interactions
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="sideeffects-tab" data-bs-toggle="tab" data-bs-target="#sideeffects" type="button" role="tab" aria-controls="sideeffects" aria-selected="false">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Side Effects
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="false">
+                            <i class="fas fa-info-circle me-2"></i>Drug Information
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="myTabContent">
+                    <!-- Interaction Checker Tab -->
+                    <div class="tab-pane fade show active" id="interaction" role="tabpanel" aria-labelledby="interaction-tab">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-search me-2"></i>Add Medications
+                                <span class="badge bg-primary drug-count" id="drug-count">0</span>
+                                <span class="clear-all float-end" onclick="clearAllDrugs()">Clear All</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-8 search-container">
+                                        <i class="fas fa-search search-icon"></i>
+                                        <input type="text" id="drug-input" class="form-control search-input" placeholder="Type drug name...">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-success w-100" onclick="addDrug()">
+                                            <i class="fas fa-plus me-2"></i>Add Drug
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="drug-list" class="mb-3"></div>
+                                <button class="btn btn-primary w-100" onclick="checkInteractions()">
+                                    <i class="fas fa-check-circle me-2"></i>Check Interactions
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="results-container" style="display: none;">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-clipboard-list me-2"></i>Interaction Results</span>
+                                    <span class="badge bg-primary" id="interaction-count">0 interactions found</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="results"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Side Effects Tab -->
+                    <div class="tab-pane fade" id="sideeffects" role="tabpanel" aria-labelledby="sideeffects-tab">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Check Side Effects
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-8 search-container">
+                                        <i class="fas fa-search search-icon"></i>
+                                        <input type="text" id="side-effect-input" class="form-control search-input" placeholder="Type drug name to check side effects...">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary w-100" onclick="checkSideEffects()">
+                                            <i class="fas fa-search me-2"></i>Check Side Effects
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div id="side-effects-results">
+                                    <p class="text-muted text-center">Enter a drug name to view its side effects</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <i class="fas fa-balance-scale me-2"></i>Compare Side Effects
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-8 search-container">
+                                        <i class="fas fa-search search-icon"></i>
+                                        <input type="text" id="compare-input" class="form-control search-input" placeholder="Type drug name to compare...">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-success w-100" onclick="addDrugToCompare()">
+                                            <i class="fas fa-plus me-2"></i>Add to Compare
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="compare-list" class="mb-3"></div>
+                                <button class="btn btn-primary w-100" onclick="compareSideEffects()">
+                                    <i class="fas fa-balance-scale me-2"></i>Compare Side Effects
+                                </button>
+                                
+                                <div id="comparison-results" class="mt-4" style="display: none;">
+                                    <h5>Side Effects Comparison</h5>
+                                    <div class="table-responsive">
+                                        <table class="comparison-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Side Effect</th>
+                                                    <!-- Drug headers will be added dynamically -->
+                                                </tr>
+                                            </thead>
+                                            <tbody id="comparison-table-body">
+                                                <!-- Comparison data will be added dynamically -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Drug Information Tab -->
+                    <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-info-circle me-2"></i>Drug Information Database
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-8 search-container">
+                                        <i class="fas fa-search search-icon"></i>
+                                        <input type="text" id="drug-info-input" class="form-control search-input" placeholder="Search for drug information...">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary w-100" onclick="searchDrugInfo()">
+                                            <i class="fas fa-search me-2"></i>Search
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div id="drug-info-results">
+                                    <p class="text-muted text-center">Enter a drug name to view detailed information</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>Always consult with a healthcare professional before making any changes to your medication regimen.</p>
+                    <p class="mb-0">© 2023 Drug Interaction & Side Effects Checker | For educational purposes only</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot -->
+    <div class="chatbot-container">
+        <div class="chatbot-button" onclick="toggleChatbot()">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="chatbot-window" id="chatbot-window">
+            <div class="chatbot-header">
+                <div>
+                    <h6 class="mb-0">MediBot Assistant</h6>
+                    <small>Ask me about medications</small>
+                </div>
+                <button class="btn btn-sm btn-light" onclick="toggleChatbot()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="message bot-message">
+                    Hello! I'm MediBot, your medication assistant. I can help answer questions about drug interactions, side effects, and more. How can I assist you today?
+                    <div class="suggested-questions mt-2">
+                        <div class="suggestion" onclick="askQuestion('What is the interaction between aspirin and warfarin?')">Aspirin + Warfarin</div>
+                        <div class="suggestion" onclick="askQuestion('What are the side effects of metformin?')">Metformin side effects</div>
+                        <div class="suggestion" onclick="askQuestion('How does ibuprofen interact with blood pressure medications?')">Ibuprofen interactions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input" placeholder="Type your question...">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+        // Sample drug database with common medications
+        const drugDatabase = [
+            "Aspirin", "Ibuprofen", "Acetaminophen", "Metformin", "Warfarin", 
+            "Lisinopril", "Atorvastatin", "Levothyroxine", "Metoprolol", "Amlodipine",
+            "Omeprazole", "Simvastatin", "Losartan", "Albuterol", "Gabapentin",
+            "Hydrochlorothiazide", "Sertraline", "Escitalopram", "Fluticasone", "Insulin",
+            "Prednisone", "Tramadol", "Carvedilol", "Furosemide", "Clopidogrel",
+            "Pantoprazole", "Venlafaxine", "Tamsulosin", "Duloxetine", "Pravastatin"
+        ];
+        
+        // Drug information database
+        const drugInfoDatabase = {
+            "Aspirin": {
+                uses: "Pain relief, fever reduction, anti-inflammatory, and antiplatelet effects",
+                sideEffects: "Stomach upset, heartburn, nausea, ringing in the ears",
+                warnings: "Do not use in children with viral infections due to risk of Reye's syndrome",
+                interactions: "Warfarin, Ibuprofen, other NSAIDs"
+            },
+            "Warfarin": {
+                uses: "Anticoagulant to prevent blood clots",
+                sideEffects: "Bleeding, bruising, hair loss, skin necrosis",
+                warnings: "Requires regular blood monitoring (INR tests)",
+                interactions: "Aspirin, Ibuprofen, antibiotics, vitamin K"
+            },
+            "Metformin": {
+                uses: "Treatment of type 2 diabetes",
+                sideEffects: "Nausea, diarrhea, stomach upset, metallic taste",
+                warnings: "Risk of lactic acidosis, especially in kidney impairment",
+                interactions: "Ibuprofen, contrast dyes, alcohol"
+            },
+            "Ibuprofen": {
+                uses: "Pain relief, fever reduction, anti-inflammatory",
+                sideEffects: "Stomach upset, heartburn, dizziness, fluid retention",
+                warnings: "Increased risk of heart attack or stroke with long-term use",
+                interactions: "Aspirin, Warfarin, other NSAIDs"
+            },
+            "Atorvastatin": {
+                uses: "Lowers cholesterol and reduces risk of heart disease",
+                sideEffects: "Muscle pain, liver problems, digestive issues",
+                warnings: "Avoid grapefruit juice; monitor liver enzymes",
+                interactions: "Certain antibiotics, antifungal medications"
+            }
+        };
+        
+        // Side effects database
+        const sideEffectsDatabase = {
+            "Aspirin": {
+                common: ["Upset stomach", "Heartburn", "Nausea", "Mild headache"],
+                serious: ["Gastrointestinal bleeding", "Allergic reactions", "Ringing in ears", "Easy bruising"],
+                rare: ["Reye's syndrome (in children)", "Severe skin reactions", "Liver problems"]
+            },
+            "Warfarin": {
+                common: ["Bruising easily", "Bleeding gums", "Nosebleeds", "Heavy menstrual periods"],
+                serious: ["Severe bleeding", "Purple toes syndrome", "Skin necrosis", "Severe headache"],
+                rare: ["Hair loss", "Rash", "Cholesterol embolization"]
+            },
+            "Metformin": {
+                common: ["Nausea", "Diarrhea", "Stomach upset", "Gas"],
+                serious: ["Lactic acidosis", "Vitamin B12 deficiency", "Low blood sugar"],
+                rare: ["Metallic taste", "Liver problems", "Allergic reactions"]
+            },
+            "Ibuprofen": {
+                common: ["Stomach pain", "Heartburn", "Nausea", "Dizziness"],
+                serious: ["Gastrointestinal bleeding", "Kidney problems", "Heart attack risk", "High blood pressure"],
+                rare: ["Severe skin reactions", "Liver damage", "Anemia"]
+            },
+            "Atorvastatin": {
+                common: ["Headache", "Joint pain", "Diarrhea", "Muscle aches"],
+                serious: ["Liver problems", "Muscle breakdown", "Memory problems", "Increased blood sugar"],
+                rare: ["Severe allergic reactions", "Pancreatitis", "Sleep problems"]
+            },
+            "Lisinopril": {
+                common: ["Cough", "Dizziness", "Headache", "Fatigue"],
+                serious: ["Swelling of face/lips", "Kidney problems", "High potassium levels", "Low blood pressure"],
+                rare: ["Liver problems", "Pancreatitis", "Severe skin reactions"]
+            },
+            "Omeprazole": {
+                common: ["Headache", "Diarrhea", "Stomach pain", "Nausea"],
+                serious: ["Vitamin B12 deficiency", "Low magnesium", "Bone fractures", "Kidney problems"],
+                rare: ["Severe allergic reactions", "Lupus", "Liver problems"]
+            }
+        };
+        
+        // Interaction database
+        const interactionDatabase = [
+            { drug_a: "Aspirin", drug_b: "Warfarin", severity: "High", description: "Increased risk of bleeding. Monitor closely for signs of bleeding." },
+            { drug_a: "Aspirin", drug_b: "Ibuprofen", severity: "Moderate", description: "May reduce the effectiveness of aspirin and increase risk of gastrointestinal bleeding." },
+            { drug_a: "Metformin", drug_b: "Ibuprofen", severity: "Low", description: "Possible increased risk of lactic acidosis, though rare." },
+            { drug_a: "Warfarin", drug_b: "Simvastatin", severity: "Moderate", description: "Increased risk of myopathy and rhabdomyolysis." },
+            { drug_a: "Lisinopril", drug_b: "Ibuprofen", severity: "Moderate", description: "May reduce antihypertensive effect and increase risk of kidney impairment." },
+            { drug_a: "Aspirin", drug_b: "Metformin", severity: "Low", description: "No significant interaction expected." }
+        ];
+        
+        let selectedDrugs = [];
+        let compareDrugs = [];
+        
+        // Initialize autocomplete for all search inputs
+        $(document).ready(function() {
+            $("#drug-input").autocomplete({
+                source: function(request, response) {
+                    let matches = $.grep(drugDatabase, function(drug) {
+                        return drug.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
+                    });
+                    response(matches.slice(0, 10));
+                },
+                minLength: 1,
+                autoFocus: true,
+                delay: 100
+            });
+            
+            $("#side-effect-input").autocomplete({
+                source: function(request, response) {
+                    let matches = $.grep(drugDatabase, function(drug) {
+                        return drug.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
+                    });
+                    response(matches.slice(0, 10));
+                },
+                minLength: 1,
+                autoFocus: true,
+                delay: 100
+            });
+            
+            $("#compare-input").autocomplete({
+                source: function(request, response) {
+                    let matches = $.grep(drugDatabase, function(drug) {
+                        return drug.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
+                    });
+                    response(matches.slice(0, 10));
+                },
+                minLength: 1,
+                autoFocus: true,
+                delay: 100
+            });
+            
+            $("#drug-info-input").autocomplete({
+                source: function(request, response) {
+                    let matches = $.grep(drugDatabase, function(drug) {
+                        return drug.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
+                    });
+                    response(matches.slice(0, 10));
+                },
+                minLength: 1,
+                autoFocus: true,
+                delay: 100
+            });
+            
+            // Allow adding drug on Enter key
+            $("#drug-input").keypress(function(e) {
+                if (e.which === 13) {
+                    addDrug();
+                }
+            });
+            
+            // Allow searching side effects on Enter key
+            $("#side-effect-input").keypress(function(e) {
+                if (e.which === 13) {
+                    checkSideEffects();
+                }
+            });
+            
+            // Allow adding drug to compare on Enter key
+            $("#compare-input").keypress(function(e) {
+                if (e.which === 13) {
+                    addDrugToCompare();
+                }
+            });
+            
+            // Allow searching drug info on Enter key
+            $("#drug-info-input").keypress(function(e) {
+                if (e.which === 13) {
+                    searchDrugInfo();
+                }
+            });
+            
+            // Allow sending chatbot message on Enter key
+            $("#chatbot-input").keypress(function(e) {
+                if (e.which === 13) {
+                    sendMessage();
+                }
+            });
+        });
+        
+        function addDrug() {
+            let input = document.getElementById('drug-input');
+            let drug = input.value.trim();
+            
+            if (drug) {
+                let matchedDrug = findClosestDrug(drug);
+                
+                if (matchedDrug && !selectedDrugs.includes(matchedDrug)) {
+                    selectedDrugs.push(matchedDrug);
+                    renderDrugTags();
+                    updateDrugCount();
+                } else if (!matchedDrug) {
+                    if (!selectedDrugs.includes(drug)) {
+                        selectedDrugs.push(drug);
+                        renderDrugTags();
+                        updateDrugCount();
+                    }
+                }
+            }
+            input.value = '';
+        }
+        
+        function addDrugToCompare() {
+            let input = document.getElementById('compare-input');
+            let drug = input.value.trim();
+            
+            if (drug) {
+                let matchedDrug = findClosestDrug(drug);
+                
+                if (matchedDrug && !compareDrugs.includes(matchedDrug)) {
+                    compareDrugs.push(matchedDrug);
+                    renderCompareTags();
+                } else if (!matchedDrug) {
+                    if (!compareDrugs.includes(drug)) {
+                        compareDrugs.push(drug);
+                        renderCompareTags();
+                    }
+                }
+            }
+            input.value = '';
+        }
+        
+        function findClosestDrug(inputDrug) {
+            inputDrug = inputDrug.toLowerCase();
+            
+            // Exact match
+            for (let drug of drugDatabase) {
+                if (drug.toLowerCase() === inputDrug) {
+                    return drug;
+                }
+            }
+            
+            // Contains match
+            for (let drug of drugDatabase) {
+                if (drug.toLowerCase().includes(inputDrug)) {
+                    return drug;
+                }
+            }
+            
+            // Fuzzy matching
+            let closestDrug = null;
+            let minDistance = Number.MAX_SAFE_INTEGER;
+            
+            for (let drug of drugDatabase) {
+                let distance = levenshteinDistance(inputDrug, drug.toLowerCase());
+                if (distance < minDistance && distance < 3) {
+                    minDistance = distance;
+                    closestDrug = drug;
+                }
+            }
+            
+            return closestDrug;
+        }
+        
+        // Levenshtein distance algorithm for fuzzy matching
+        function levenshteinDistance(a, b) {
+            const matrix = [];
+            
+            for (let i = 0; i <= b.length; i++) {
+                matrix[i] = [i];
+            }
+            
+            for (let j = 0; j <= a.length; j++) {
+                matrix[0][j] = j;
+            }
+            
+            for (let i = 1; i <= b.length; i++) {
+                for (let j = 1; j <= a.length; j++) {
+                    if (b.charAt(i-1) === a.charAt(j-1)) {
+                        matrix[i][j] = matrix[i-1][j-1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i-1][j-1] + 1,
+                            matrix[i][j-1] + 1,
+                            matrix[i-1][j] + 1
+                        );
+                    }
+                }
+            }
+            
+            return matrix[b.length][a.length];
+        }
+        
+        function renderDrugTags() {
+            let list = document.getElementById('drug-list');
+            list.innerHTML = '';
+            
+            if (selectedDrugs.length === 0) {
+                list.innerHTML = '<p class="text-muted">No drugs added yet. Start by adding medications above.</p>';
+                return;
+            }
+            
+            selectedDrugs.forEach(d => {
+                let tag = document.createElement('span');
+                tag.className = 'drug-tag';
+                tag.innerHTML = d + ' <span style="cursor:pointer; margin-left: 8px;" onclick="removeDrug(\''+d+'\')"><i class="fas fa-times"></i></span>';
+                list.appendChild(tag);
+            });
+        }
+        
+        function renderCompareTags() {
+            let list = document.getElementById('compare-list');
+            list.innerHTML = '';
+            
+            if (compareDrugs.length === 0) {
+                list.innerHTML = '<p class="text-muted">No drugs added for comparison yet.</p>';
+                return;
+            }
+            
+            compareDrugs.forEach(d => {
+                let tag = document.createElement('span');
+                tag.className = 'drug-tag';
+                tag.innerHTML = d + ' <span style="cursor:pointer; margin-left: 8px;" onclick="removeCompareDrug(\''+d+'\')"><i class="fas fa-times"></i></span>';
+                list.appendChild(tag);
+            });
+        }
+        
+        function removeDrug(drug) {
+            selectedDrugs = selectedDrugs.filter(d => d !== drug);
+            renderDrugTags();
+            updateDrugCount();
+        }
+        
+        function removeCompareDrug(drug) {
+            compareDrugs = compareDrugs.filter(d => d !== drug);
+            renderCompareTags();
+        }
+        
+        function clearAllDrugs() {
+            selectedDrugs = [];
+            renderDrugTags();
+            updateDrugCount();
+            document.getElementById('results-container').style.display = 'none';
+        }
+        
+        function updateDrugCount() {
+            document.getElementById('drug-count').textContent = selectedDrugs.length;
+        }
+        
+        async function checkInteractions() {
+            if (selectedDrugs.length < 2) {
+                alert('Please add at least 2 drugs to check for interactions.');
+                return;
+            }
+            
+            document.getElementById('results').innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Checking interactions...</p></div>';
+            document.getElementById('results-container').style.display = 'block';
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            let interactions = [];
+            for (let i = 0; i < selectedDrugs.length; i++) {
+                for (let j = i + 1; j < selectedDrugs.length; j++) {
+                    let drugA = selectedDrugs[i];
+                    let drugB = selectedDrugs[j];
+                    
+                    let interaction = interactionDatabase.find(ia => 
+                        (ia.drug_a === drugA && ia.drug_b === drugB) || 
+                        (ia.drug_a === drugB && ia.drug_b === drugA)
+                    );
+                    
+                    if (interaction) {
+                        interactions.push(interaction);
+                    } else {
+                        interactions.push({
+                            drug_a: drugA,
+                            drug_b: drugB,
+                            severity: "None",
+                            description: "No significant interaction expected."
+                        });
+                    }
+                }
+            }
+            
+            displayInteractions(interactions);
+        }
+        
+        function displayInteractions(interactions) {
+            let resultsEl = document.getElementById('results');
+            resultsEl.innerHTML = '';
+            
+            let highCount = interactions.filter(i => i.severity === "High").length;
+            let moderateCount = interactions.filter(i => i.severity === "Moderate").length;
+            let lowCount = interactions.filter(i => i.severity === "Low").length;
+            let noneCount = interactions.filter(i => i.severity === "None").length;
+            
+            let totalInteractions = highCount + moderateCount + lowCount;
+            document.getElementById('interaction-count').textContent = 
+                totalInteractions + (totalInteractions === 1 ? " interaction found" : " interactions found");
+            
+            if (totalInteractions === 0) {
+                resultsEl.innerHTML = `
+                    <div class="no-interactions">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h4>No significant interactions found!</h4>
+                        <p class="text-muted">The medications you've selected don't have any known significant interactions.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (highCount > 0) {
+                let highSection = createSeveritySection("High", "fas fa-exclamation-triangle", "danger", interactions.filter(i => i.severity === "High"));
+                resultsEl.appendChild(highSection);
+            }
+            
+            if (moderateCount > 0) {
+                let moderateSection = createSeveritySection("Moderate", "fas fa-exclamation-circle", "warning", interactions.filter(i => i.severity === "Moderate"));
+                resultsEl.appendChild(moderateSection);
+            }
+            
+            if (lowCount > 0) {
+                let lowSection = createSeveritySection("Low", "fas fa-info-circle", "success", interactions.filter(i => i.severity === "Low"));
+                resultsEl.appendChild(lowSection);
+            }
+            
+            if (noneCount > 0) {
+                let noneSection = document.createElement('div');
+                noneSection.className = 'severity-section';
+                noneSection.innerHTML = `
+                    <div class="severity-header">
+                        <i class="fas fa-check-circle severity-icon text-success"></i>
+                        <h5 class="mb-0 text-success">No Significant Interactions</h5>
+                    </div>
+                    <p class="text-muted">The following drug combinations showed no significant interactions:</p>
+                `;
+                
+                let noneList = document.createElement('ul');
+                noneList.className = 'list-group';
+                
+                interactions.filter(i => i.severity === "None").forEach(interaction => {
+                    let listItem = document.createElement('li');
+                    listItem.className = 'list-group-item border-0 bg-light';
+                    listItem.textContent = `${interaction.drug_a} + ${interaction.drug_b}`;
+                    noneList.appendChild(listItem);
+                });
+                
+                noneSection.appendChild(noneList);
+                resultsEl.appendChild(noneSection);
+            }
+        }
+        
+        function createSeveritySection(severity, icon, color, interactions) {
+            let section = document.createElement('div');
+            section.className = 'severity-section';
+            
+            let iconColor = color === 'danger' ? 'text-danger' : 
+                           color === 'warning' ? 'text-warning' : 'text-success';
+            
+            section.innerHTML = `
+                <div class="severity-header">
+                    <i class="${icon} severity-icon ${iconColor}"></i>
+                    <h5 class="mb-0 text-${color}">${severity} Risk Interactions</h5>
+                    <span class="badge bg-${color} ms-2">${interactions.length}</span>
+                </div>
+            `;
+            
+            interactions.forEach(interaction => {
+                let badgeClass = '';
+                let interactionClass = '';
+                
+                if (severity === 'High') {
+                    badgeClass = 'badge-high';
+                    interactionClass = 'interaction-high';
+                } else if (severity === 'Moderate') {
+                    badgeClass = 'badge-moderate';
+                    interactionClass = 'interaction-moderate';
+                } else {
+                    badgeClass = 'badge-low';
+                    interactionClass = 'interaction-low';
+                }
+                
+                let card = document.createElement('div');
+                card.className = `card interaction-card ${interactionClass}`;
+                card.innerHTML = `
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="card-title mb-0">${interaction.drug_a} + ${interaction.drug_b}</h6>
+                            <span class="badge ${badgeClass}">${interaction.severity} Risk</span>
+                        </div>
+                        <p class="card-text">${interaction.description}</p>
+                    </div>
+                `;
+                section.appendChild(card);
+            });
+            
+            return section;
+        }
+        
+        // Side Effects Functionality
+        function checkSideEffects() {
+            let input = document.getElementById('side-effect-input');
+            let drugName = input.value.trim();
+            
+            if (!drugName) {
+                alert('Please enter a drug name to check side effects.');
+                return;
+            }
+            
+            let matchedDrug = findClosestDrug(drugName);
+            
+            if (!matchedDrug) {
+                document.getElementById('side-effects-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        No information found for "${drugName}". Please check the spelling or try a different drug.
+                    </div>
+                `;
+                return;
+            }
+            
+            let sideEffects = sideEffectsDatabase[matchedDrug];
+            if (sideEffects) {
+                let sideEffectsHTML = `
+                    <div class="card drug-info-card">
+                        <div class="card-body">
+                            <div class="drug-info-header">
+                                <h4>${matchedDrug}</h4>
+                                <span class="badge bg-primary">Side Effects</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h6><i class="fas fa-exclamation-circle me-2 text-warning"></i>Common Side Effects</h6>
+                `;
+                
+                if (sideEffects.common && sideEffects.common.length > 0) {
+                    sideEffects.common.forEach(effect => {
+                        sideEffectsHTML += `
+                            <div class="side-effect-item side-effect-common">
+                                <div class="side-effect-frequency text-warning">Common</div>
+                                <div>${effect}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    sideEffectsHTML += `<p class="text-muted">No common side effects listed.</p>`;
+                }
+                
+                sideEffectsHTML += `
+                                </div>
+                                <div class="col-md-4">
+                                    <h6><i class="fas fa-exclamation-triangle me-2 text-danger"></i>Serious Side Effects</h6>
+                `;
+                
+                if (sideEffects.serious && sideEffects.serious.length > 0) {
+                    sideEffects.serious.forEach(effect => {
+                        sideEffectsHTML += `
+                            <div class="side-effect-item side-effect-serious">
+                                <div class="side-effect-frequency text-danger">Serious</div>
+                                <div>${effect}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    sideEffectsHTML += `<p class="text-muted">No serious side effects listed.</p>`;
+                }
+                
+                sideEffectsHTML += `
+                                </div>
+                                <div class="col-md-4">
+                                    <h6><i class="fas fa-info-circle me-2 text-info"></i>Rare Side Effects</h6>
+                `;
+                
+                if (sideEffects.rare && sideEffects.rare.length > 0) {
+                    sideEffects.rare.forEach(effect => {
+                        sideEffectsHTML += `
+                            <div class="side-effect-item side-effect-rare">
+                                <div class="side-effect-frequency text-info">Rare</div>
+                                <div>${effect}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    sideEffectsHTML += `<p class="text-muted">No rare side effects listed.</p>`;
+                }
+                
+                sideEffectsHTML += `
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('side-effects-results').innerHTML = sideEffectsHTML;
+            } else {
+                document.getElementById('side-effects-results').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No side effects information available for "${matchedDrug}" in our database.
+                    </div>
+                `;
+            }
+            
+            input.value = '';
+        }
+        
+        // Compare Side Effects Functionality
+        function compareSideEffects() {
+            if (compareDrugs.length < 2) {
+                alert('Please add at least 2 drugs to compare side effects.');
+                return;
+            }
+            
+            // Get all unique side effects from all drugs
+            let allSideEffects = new Set();
+            compareDrugs.forEach(drug => {
+                if (sideEffectsDatabase[drug]) {
+                    if (sideEffectsDatabase[drug].common) {
+                        sideEffectsDatabase[drug].common.forEach(effect => allSideEffects.add(effect));
+                    }
+                    if (sideEffectsDatabase[drug].serious) {
+                        sideEffectsDatabase[drug].serious.forEach(effect => allSideEffects.add(effect));
+                    }
+                    if (sideEffectsDatabase[drug].rare) {
+                        sideEffectsDatabase[drug].rare.forEach(effect => allSideEffects.add(effect));
+                    }
+                }
+            });
+            
+            // Create table header
+            let tableHeader = '<tr><th>Side Effect</th>';
+            compareDrugs.forEach(drug => {
+                tableHeader += `<th>${drug}</th>`;
+            });
+            tableHeader += '</tr>';
+            
+            // Create table body
+            let tableBody = '';
+            allSideEffects.forEach(effect => {
+                tableBody += '<tr>';
+                tableBody += `<td>${effect}</td>`;
+                
+                compareDrugs.forEach(drug => {
+                    let hasEffect = false;
+                    let frequency = '';
+                    
+                    if (sideEffectsDatabase[drug]) {
+                        if (sideEffectsDatabase[drug].common && sideEffectsDatabase[drug].common.includes(effect)) {
+                            hasEffect = true;
+                            frequency = 'Common';
+                        } else if (sideEffectsDatabase[drug].serious && sideEffectsDatabase[drug].serious.includes(effect)) {
+                            hasEffect = true;
+                            frequency = 'Serious';
+                        } else if (sideEffectsDatabase[drug].rare && sideEffectsDatabase[drug].rare.includes(effect)) {
+                            hasEffect = true;
+                            frequency = 'Rare';
+                        }
+                    }
+                    
+                    if (hasEffect) {
+                        let badgeClass = frequency === 'Common' ? 'badge bg-warning' : 
+                                        frequency === 'Serious' ? 'badge bg-danger' : 'badge bg-info';
+                        tableBody += `<td><span class="${badgeClass}">${frequency}</span></td>`;
+                    } else {
+                        tableBody += '<td>-</td>';
+                    }
+                });
+                
+                tableBody += '</tr>';
+            });
+            
+            // Update the table
+            document.querySelector('.comparison-table thead').innerHTML = tableHeader;
+            document.getElementById('comparison-table-body').innerHTML = tableBody;
+            document.getElementById('comparison-results').style.display = 'block';
+        }
+        
+        function searchDrugInfo() {
+            let input = document.getElementById('drug-info-input');
+            let drugName = input.value.trim();
+            
+            if (!drugName) {
+                alert('Please enter a drug name to search for information.');
+                return;
+            }
+            
+            let matchedDrug = findClosestDrug(drugName);
+            
+            if (!matchedDrug) {
+                document.getElementById('drug-info-results').innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        No information found for "${drugName}". Please check the spelling or try a different drug.
+                    </div>
+                `;
+                return;
+            }
+            
+            let drugInfo = drugInfoDatabase[matchedDrug];
+            if (drugInfo) {
+                document.getElementById('drug-info-results').innerHTML = `
+                    <div class="card drug-info-card">
+                        <div class="card-body">
+                            <div class="drug-info-header">
+                                <h4>${matchedDrug}</h4>
+                                <span class="badge bg-primary">Drug Information</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-pills me-2 text-primary"></i>Common Uses</h6>
+                                    <p>${drugInfo.uses}</p>
+                                    
+                                    <h6><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Side Effects</h6>
+                                    <p>${drugInfo.sideEffects}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-info-circle me-2 text-info"></i>Warnings</h6>
+                                    <p>${drugInfo.warnings}</p>
+                                    
+                                    <h6><i class="fas fa-exchange-alt me-2 text-danger"></i>Common Interactions</h6>
+                                    <p>${drugInfo.interactions}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('drug-info-results').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Basic information for "${matchedDrug}" is available, but detailed information is not in our database yet.
+                    </div>
+                `;
+            }
+            
+            input.value = '';
+        }
+        
+        // Chatbot functionality
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbot-window');
+            if (chatbotWindow.style.display === 'flex') {
+                chatbotWindow.style.display = 'none';
+            } else {
+                chatbotWindow.style.display = 'flex';
+                document.getElementById('chatbot-input').focus();
+            }
+        }
+        
+        function askQuestion(question) {
+            document.getElementById('chatbot-input').value = question;
+            sendMessage();
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('chatbot-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat(message, 'user');
+            input.value = '';
+            
+            // Simulate AI thinking
+            setTimeout(() => {
+                const response = generateResponse(message);
+                addMessageToChat(response, 'bot');
+            }, 1000);
+        }
+        
+        function addMessageToChat(message, sender) {
+            const chatMessages = document.getElementById('chatbot-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function generateResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Check for drug interaction questions
+            for (let interaction of interactionDatabase) {
+                if (lowerMessage.includes(interaction.drug_a.toLowerCase()) && 
+                    lowerMessage.includes(interaction.drug_b.toLowerCase()) &&
+                    (lowerMessage.includes('interaction') || lowerMessage.includes('interact'))) {
+                    return `The interaction between ${interaction.drug_a} and ${interaction.drug_b} is classified as ${interaction.severity} risk. ${interaction.description}`;
+                }
+            }
+            
+            // Check for side effects questions
+            for (let drug in sideEffectsDatabase) {
+                if (lowerMessage.includes(drug.toLowerCase()) && 
+                    (lowerMessage.includes('side effect') || lowerMessage.includes('side effects'))) {
+                    
+                    let response = `Here are the side effects of ${drug}:\n\n`;
+                    
+                    if (sideEffectsDatabase[drug].common && sideEffectsDatabase[drug].common.length > 0) {
+                        response += `Common: ${sideEffectsDatabase[drug].common.join(', ')}\n\n`;
+                    }
+                    
+                    if (sideEffectsDatabase[drug].serious && sideEffectsDatabase[drug].serious.length > 0) {
+                        response += `Serious: ${sideEffectsDatabase[drug].serious.join(', ')}\n\n`;
+                    }
+                    
+                    if (sideEffectsDatabase[drug].rare && sideEffectsDatabase[drug].rare.length > 0) {
+                        response += `Rare: ${sideEffectsDatabase[drug].rare.join(', ')}`;
+                    }
+                    
+                    return response;
+                }
+            }
+            
+            // Check for drug information questions
+            for (let drug in drugInfoDatabase) {
+                if (lowerMessage.includes(drug.toLowerCase())) {
+                    if (lowerMessage.includes('use') || lowerMessage.includes('purpose')) {
+                        return `${drug} is commonly used for: ${drugInfoDatabase[drug].uses}`;
+                    } else if (lowerMessage.includes('warning') || lowerMessage.includes('precaution')) {
+                        return `Important warnings for ${drug}: ${drugInfoDatabase[drug].warnings}`;
+                    } else if (lowerMessage.includes('interaction') || lowerMessage.includes('interact')) {
+                        return `${drug} may interact with: ${drugInfoDatabase[drug].interactions}`;
+                    } else {
+                        return `I found information about ${drug}. You can ask me about its uses, side effects, warnings, or interactions.`;
+                    }
+                }
+            }
+            
+            // General responses
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                return "Hello! I'm MediBot, your medication assistant. How can I help you today?";
+            } else if (lowerMessage.includes('thank')) {
+                return "You're welcome! Is there anything else you'd like to know about medications?";
+            } else if (lowerMessage.includes('help')) {
+                return "I can help you with information about drug interactions, side effects, uses, and warnings. Try asking about a specific medication or interaction.";
+            } else {
+                return "I'm not sure I understand. Could you try rephrasing your question? I can help with drug interactions, side effects, and medication information.";
+            }
+        }
+        
+        // Initialize the page
+        $(document).ready(function() {
+            renderDrugTags();
+            updateDrugCount();
+        });
+    </script>
+</body>
+</html>
