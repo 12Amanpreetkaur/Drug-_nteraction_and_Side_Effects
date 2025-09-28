@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Drug Interaction & Side-Effect Alert App — Prototype
 
 This is a self-contained prototype you can run locally. It includes:
@@ -56,3 +57,6 @@ Aspirin,Warfarin,high,Increased bleeding risk
 - Add an RxNorm import script (pulling RxCUI data) — requires web access/API key.
 - Add user accounts and encrypted local storage.
 - Implement LLM forwarding with safe prompt templates & pharmacist-review workflow.
+=======
+# Drug-_nteraction_and_Side_Effects
+>>>>>>> c69c4fcbc889f2edc767e8d86ad747922f369304
